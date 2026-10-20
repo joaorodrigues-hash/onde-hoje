@@ -1,4 +1,4 @@
-const API = "https://ondehoje-api.onrender.com";
+const API = window.location.origin;
 
 let listaDeRoles = [];
 let imagemBase64 = ""; 
