@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onde Hoje - Descubra os Melhores Eventos</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230f172a'%3E%3Cpath d='M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z' fill='%23DB5227'/%3E%3C/svg%3E">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-[#e4e8ee] text-slate-800 min-h-screen font-['Inter'] antialiased flex flex-col justify-between">
+
+    <!-- Topbar -->
+    <header class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-[#DB5227]"></span>
+                <h1 class="text-xl font-black text-slate-900 tracking-tight">Onde<span class="text-[#DB5227]">Hoje</span></h1>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <button onclick="abrirModalSugerir()" class="neo-btn px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-[#DB5227]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    <span class="hidden sm:inline">Sugerir Evento</span>
+                </button>
+                <a href="parceiros.html" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition">Área do Produtor</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Área Principal -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-10 w-full flex-1 space-y-14">
+        
+        <!-- Hero de Busca -->
+        <section class="neo-box p-6 sm:p-8 text-center max-w-4xl mx-auto space-y-6">
+            <div>
+                <span class="text-xs font-bold uppercase tracking-widest text-[#DB5227]">Localize sua programação</span>
+                <h2 class="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight mt-1">O que você quer curtir hoje?</h2>
+                <p class="text-xs sm:text-sm text-slate-500 mt-2">Busque por estado ou afunile por cidade e estilo musical</p>
+            </div>
+
+            <!-- Filtros -->
+            <form onsubmit="filtrarRoles(event)" class="grid grid-cols-1 md:grid-cols-12 gap-3 pt-2 text-left">
+                <!-- Seletor de Estado (UF) -->
+                <div class="md:col-span-3 relative" id="wrapperEstado">
+                    <label class="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">Estado (UF)</label>
+                    <div class="relative">
+                        <input type="text" id="filtroEstado" class="neo-input text-sm uppercase font-semibold pr-8" placeholder="Todos ou digite" autocomplete="off" onfocus="abrirDropdownEstados()" oninput="filtrarOpcoesEstado(this.value)">
+                        <button type="button" onclick="alternarDropdownEstados(event)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                    </div>
+                    <div id="listaEstadosMenu" class="hidden absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-56 overflow-y-auto z-50 divide-y divide-slate-100 text-xs"></div>
+                </div>
+
+                <!-- Cidade -->
+                <div class="md:col-span-4">
+                    <label class="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">Cidade (Opcional)</label>
+                    <input type="text" id="filtroCidade" class="neo-input text-sm" placeholder="Todas as cidades">
+                </div>
+
+                <!-- Categoria -->
+                <div class="md:col-span-3">
+                    <label class="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">Estilo / Categoria</label>
+                    <select id="filtroCategoria" class="neo-input text-sm font-medium">
+                        <option value="">Todos os Estilos</option>
+                    </select>
+                </div>
+
+                <!-- Botão Buscar -->
+                <div class="md:col-span-2 flex items-end">
+                    <button type="submit" class="neo-btn neo-btn-accent w-full py-3 text-xs font-bold uppercase tracking-wider flex justify-center items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        Buscar
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Feed: Programação em Destaque (Máx 12) -->
+        <section class="space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                    <h3 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Programação em Destaque</h3>
+                    <p class="text-xs text-slate-500 font-medium" id="subtituloDestaque">Exibindo os principais rolês confirmados</p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button onclick="limparFiltros()" class="text-xs font-bold text-slate-500 hover:text-slate-800 uppercase tracking-wider">Limpar</button>
+                    <a href="explorar.html?tipo=ativos" class="text-xs font-bold text-[#DB5227] hover:underline uppercase tracking-wider flex items-center gap-1">
+                        Ver catálogo completo
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </a>
+                </div>
+            </div>
+
+            <div id="gridAtivos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+            <!-- Botão de Acesso à Tela Completa -->
+            <div id="boxVerMaisAtivos" class="text-center pt-2 hidden">
+                <a href="explorar.html?tipo=ativos" class="inline-flex items-center gap-2 px-6 py-3.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-sm">
+                    <span id="labelTotalAtivos">Ver todos os eventos disponíveis</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                </a>
+            </div>
+        </section>
+
+        <!-- Seção: Rolês Anteriores (Máx 4) -->
+        <section class="border-t border-slate-300/60 pt-10 space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Arquivo Histórico</span>
+                    <h3 class="text-lg sm:text-xl font-bold tracking-tight text-slate-800">Rolês Anteriores</h3>
+                    <p class="text-xs text-slate-500">Últimos eventos já realizados na plataforma</p>
+                </div>
+                <a href="explorar.html?tipo=passados" class="text-xs font-bold text-slate-600 hover:text-slate-900 uppercase tracking-wider flex items-center gap-1">
+                    Abrir arquivo histórico
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </a>
+            </div>
+
+            <div id="gridPassados" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 opacity-85"></div>
+
+            <div id="boxVerMaisPassados" class="text-center pt-2 hidden">
+                <a href="explorar.html?tipo=passados" class="inline-flex items-center gap-2 px-5 py-3 bg-white/70 hover:bg-white text-slate-700 border border-slate-300 rounded-xl text-xs font-bold uppercase tracking-wider transition">
+                    <span id="labelTotalPassados">Acessar acervo histórico completo</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                </a>
+            </div>
+        </section>
+
+        <!-- CTA Produtor -->
+        <section class="neo-box p-8 md:p-12 relative overflow-hidden bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-3xl">
+            <div class="relative z-10 max-w-2xl space-y-4">
+                <span class="text-[11px] font-bold uppercase tracking-widest text-[#DB5227]">Parcerias Comerciais</span>
+                <h3 class="text-2xl md:text-3xl font-black tracking-tight leading-tight">Produz eventos, administra um bar ou casa noturna?</h3>
+                <p class="text-sm text-slate-300 leading-relaxed">
+                    Divulgue sua programação semanal para o público certo da sua cidade. Acompanhe métricas de curtidas, interesse do público e gerencie todos os seus rolês em um painel unificado.
+                </p>
+                <div class="pt-2 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                    <a href="parceiros.html" class="px-6 py-3.5 bg-[#DB5227] hover:bg-[#c2441e] text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-md">
+                        Cadastrar meu Estabelecimento
+                    </a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-200 bg-white/50 py-8 px-6 text-center text-xs text-slate-500 font-medium">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <p>© 2026 Onde Hoje - A plataforma oficial de rolês e eventos.</p>
+            <div class="flex items-center gap-4 text-xs font-semibold">
+                <a href="explorar.html" class="hover:text-slate-900">Todos os Rolês</a>
+                <span>•</span>
+                <a href="parceiros.html" class="hover:text-slate-900 text-[#DB5227]">Área do Produtor</a>
+                <span>•</span>
+                <a href="admin.html" class="hover:text-slate-900">Acesso Restrito</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Botão Flutuante de WhatsApp -->
+    <a href="https://wa.me/5511999999999?text=Ol%C3%A1!%20Gostaria%20de%20tirar%20uma%20d%C3%BAvida%20sobre%20o%20Onde%20Hoje." target="_blank" rel="noopener noreferrer" 
+       class="fixed bottom-6 right-6 z-40 p-3.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full shadow-lg transition-transform hover:scale-105 flex items-center justify-center">
+        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+    </a>
+
+    <!-- Modal: Detalhes Completos do Evento -->
+    <div id="modalDetalhes" class="fixed inset-0 modal-overlay z-50 hidden flex justify-center items-end sm:items-center p-0 sm:p-4">
+        <div class="bg-[#e4e8ee] w-full max-w-2xl rounded-t-3xl sm:rounded-3xl max-h-[92vh] overflow-hidden flex flex-col relative shadow-2xl">
+            <!-- Botão Fechar -->
+            <button onclick="fecharModalDetalhes()" class="absolute top-4 right-4 z-20 bg-slate-900/60 hover:bg-slate-900 text-white p-2 rounded-full backdrop-blur-md transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+
+            <!-- Banner do Evento -->
+            <div class="relative h-60 sm:h-72 w-full bg-slate-900 shrink-0">
+                <img id="detImg" src="" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/30 to-transparent"></div>
+                <div class="absolute bottom-4 left-5 right-5 text-white">
+                    <span id="detCat" class="bg-[#DB5227] text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md inline-block mb-2"></span>
+                    <h2 id="detTitulo" class="text-xl sm:text-2xl font-black leading-tight"></h2>
+                    <p id="detLocal" class="text-xs sm:text-sm text-slate-200 mt-1 font-medium"></p>
+                </div>
+            </div>
+
+            <!-- Corpo dos Detalhes -->
+            <div class="p-6 overflow-y-auto space-y-6 flex-1">
+                <!-- Informações Rápidas -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    <div class="bg-white/60 border border-slate-200/80 p-3 rounded-xl text-center">
+                        <span class="text-[10px] font-bold uppercase text-slate-400 block">Data do Evento</span>
+                        <span id="detData" class="text-xs sm:text-sm font-bold text-slate-800"></span>
+                    </div>
+                    <div class="bg-white/60 border border-slate-200/80 p-3 rounded-xl text-center">
+                        <span class="text-[10px] font-bold uppercase text-slate-400 block">Entrada / Valor</span>
+                        <span id="detPreco" class="text-xs sm:text-sm font-bold text-[#DB5227]"></span>
+                    </div>
+                    <div class="col-span-2 sm:col-span-1 bg-white/60 border border-slate-200/80 p-3 rounded-xl text-center">
+                        <span class="text-[10px] font-bold uppercase text-slate-400 block">Interesse</span>
+                        <span id="detLikes" class="text-xs sm:text-sm font-bold text-slate-800"></span>
+                    </div>
+                </div>
+
+                <!-- Descrição -->
+                <div class="space-y-2">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-700">Sobre o Evento</h4>
+                    <p id="detDesc" class="text-xs sm:text-sm text-slate-600 leading-relaxed whitespace-pre-line"></p>
+                </div>
+
+                <!-- Ações -->
+                <div class="pt-2 flex flex-col sm:flex-row gap-3">
+                    <a id="detLinkIngresso" href="#" target="_blank" class="flex-1 py-3.5 bg-[#DB5227] hover:bg-[#c2441e] text-white text-center rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-sm">
+                        Garantir Ingresso / Presença
+                    </a>
+                    <button id="detBtnShare" onclick="compartilharEvento()" class="py-3.5 px-6 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+                        Compartilhar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Sugerir Evento -->
+    <div id="modalSugerir" class="fixed inset-0 modal-overlay z-50 hidden flex justify-center items-center p-4">
+        <div class="bg-[#e4e8ee] w-full max-w-2xl rounded-3xl p-6 md:p-8 max-h-[90vh] flex flex-col relative" style="box-shadow: 12px 12px 24px #c2c5ca, -12px -12px 24px #ffffff;">
+            <button onclick="fecharModalSugerir()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-800 transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+            
+            <h2 class="text-2xl font-bold tracking-tight text-slate-900 mb-1">Indicar um Rolê</h2>
+            <p class="text-xs text-slate-500 mb-6">Ajude a comunidade a descobrir novas atrações e eventos.</p>
+            
+            <form onsubmit="enviarSugestao(event)" class="overflow-y-auto pr-2 space-y-4 flex-1">
+                <div>
+                    <label class="text-[11px] font-bold uppercase tracking-wider text-slate-600 block mb-1">Título do Evento</label>
+                    <input type="text" id="sugTitle" class="neo-input text-sm" placeholder="Nome oficial do rolê" required>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[11px] font-bold uppercase tracking-wider text-slate-600 block mb-1">Local / Estabelecimento</label>
+                        <input type="text" id="sugVenue" class="neo-input text-sm" placeholder="Nome do espaço ou bar" required>
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold uppercase tracking-wider text-slate-600 block mb-1">Data do Evento</label>
+                        <input type="date" id="sugData" class="neo-input text-sm" required>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[11px] font-bold uppercase tracking-wider text-slate-600 block mb-1">Estado (UF)</label>
+                        <input type="text" id="sugEstado" class="neo-input text-sm uppercase font-semibold" placeholder="Ex: SP, RJ" maxlength="2" required>
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold uppercase tracking-wider text-slate-600 block mb-1">Cidade</label>
+                        <input type="text" id="sugCidade" class="neo-input text-sm" placeholder="Nome da cidade" required>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[11px] font-bold uppercase tracking-wider text-slate-600 block mb-1">Preço / Entrada</label>
+                        <input type="text" id="sugPrice" class="neo-input text-sm" placeholder="Ex: Gratuito ou R$ 30" required>
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold uppercase tracking-wider text-slate-600 block mb-1">Categoria</label>
+                        <select id="sugCategoria" class="neo-input text-sm" required></select>
+                    </div>
+                </div>
+
+                <!-- Gestão de Imagem Flexível -->
+                <div class="border border-slate-300/60 p-4 rounded-2xl bg-white/40 space-y-3">
+                    <label class="text-[11px] font-bold uppercase tracking-wider text-slate-700 block">Imagem de Divulgação</label>
+                    <div class="flex gap-4 text-xs font-semibold">
+                        <label class="flex items-center gap-1.5 cursor-pointer">
+                            <input type="radio" name="tipoImagem" value="url" checked onchange="alternarModoImagem('url')">
+                            Link/URL
+                        </label>
+                        <label class="flex items-center gap-1.5 cursor-pointer">
+                            <input type="radio" name="tipoImagem" value="arquivo" onchange="alternarModoImagem('arquivo')">
+                            Upload do PC/Celular
+                        </label>
+                        <label class="flex items-center gap-1.5 cursor-pointer">
+                            <input type="radio" name="tipoImagem" value="sem_foto" onchange="alternarModoImagem('sem_foto')">
+                            Não tenho foto
+                        </label>
+                    </div>
+
+                    <input type="url" id="sugImgUrl" class="neo-input text-sm" placeholder="https://exemplo.com/cartaz.jpg">
+                    <input type="file" id="sugImgFile" class="neo-input text-sm hidden bg-white" accept="image/*">
+                    <p id="msgSemFoto" class="text-xs text-slate-500 font-medium hidden">Uma imagem ilustrativa padrão da categoria será associada automaticamente.</p>
+                </div>
+
+                <div>
+                    <label class="text-[11px] font-bold uppercase tracking-wider text-slate-600 block mb-1">Descrição do Rolê</label>
+                    <textarea id="sugDescricao" rows="2" class="neo-input text-sm" placeholder="Conte mais detalhes da festa, atrações, horários..."></textarea>
+                </div>
+
+                <div class="bg-amber-50/70 border border-amber-200/80 p-4 rounded-2xl space-y-1">
+                    <label class="text-[10px] font-bold uppercase tracking-wider text-amber-900 block">Recado para os Moderadores (Campo Interno)</label>
+                    <input type="text" id="sugObs" class="neo-input text-xs bg-white/70" placeholder="Ex: Sou o produtor do evento, ingressos liberados no lote 1">
+                    <p class="text-[10px] text-amber-700 font-medium leading-relaxed">Esta informação não aparecerá no site público. Ela é enviada apenas para os administradores revisarem antes de aprovar.</p>
+                </div>
+
+                <div class="flex justify-end pt-2">
+                    <button type="submit" id="btnSubmitSugestao" class="neo-btn neo-btn-accent px-8 py-3 text-xs font-bold uppercase tracking-wider">Submeter Proposta</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API = "http://127.0.0.1:8000";
+        let eventosCache = {};
+        let eventoSelecionadoAtual = null;
+
+        const ESTADOS_BRASIL = [
+            { uf: "AC", nome: "Acre" }, { uf: "AL", nome: "Alagoas" }, { uf: "AP", nome: "Amapá" },
+            { uf: "AM", nome: "Amazonas" }, { uf: "BA", nome: "Bahia" }, { uf: "CE", nome: "Ceará" },
+            { uf: "DF", nome: "Distrito Federal" }, { uf: "ES", nome: "Espírito Santo" }, { uf: "GO", nome: "Goiás" },
+            { uf: "MA", nome: "Maranhão" }, { uf: "MT", nome: "Mato Grosso" }, { uf: "MS", nome: "Mato Grosso do Sul" },
+            { uf: "MG", nome: "Minas Gerais" }, { uf: "PA", nome: "Pará" }, { uf: "PB", nome: "Paraíba" },
+            { uf: "PR", nome: "Paraná" }, { uf: "PE", nome: "Pernambuco" }, { uf: "PI", nome: "Piauí" },
+            { uf: "RJ", nome: "Rio de Janeiro" }, { uf: "RN", nome: "Rio Grande do Norte" }, { uf: "RS", nome: "Rio Grande do Sul" },
+            { uf: "RO", nome: "Rondônia" }, { uf: "RR", nome: "Roraima" }, { uf: "SC", nome: "Santa Catarina" },
+            { uf: "SP", nome: "São Paulo" }, { uf: "SE", nome: "Sergipe" }, { uf: "TO", nome: "Tocantins" }
+        ];
+
+        window.onload = () => {
+            carregarCategorias();
+            buscarRoles();
+            buscarRolesPassados();
+        };
+
+        function renderizarListaEstados(itens) {
+            const menu = document.getElementById('listaEstadosMenu');
+            if (itens.length === 0) {
+                menu.innerHTML = '<div class="p-3 text-slate-400 text-center font-medium">Nenhum estado localizado</div>';
+                return;
+            }
+            menu.innerHTML = itens.map(e => `
+                <div onclick="selecionarEstado('${e.uf}')" class="p-2.5 hover:bg-slate-100 cursor-pointer flex justify-between items-center transition">
+                    <span class="font-bold text-slate-800">${e.uf}</span>
+                    <span class="text-slate-500 font-medium">${e.nome}</span>
+                </div>
+            `).join('');
+        }
+
+        function abrirDropdownEstados() {
+            renderizarListaEstados(ESTADOS_BRASIL);
+            document.getElementById('listaEstadosMenu').classList.remove('hidden');
+        }
+
+        function alternarDropdownEstados(e) {
+            e.stopPropagation();
+            const menu = document.getElementById('listaEstadosMenu');
+            if (menu.classList.contains('hidden')) abrirDropdownEstados();
+            else menu.classList.add('hidden');
+        }
+
+        function filtrarOpcoesEstado(termo) {
+            const busca = termo.trim().toLowerCase();
+            const filtrados = ESTADOS_BRASIL.filter(e => 
+                e.uf.toLowerCase().startsWith(busca) || 
+                e.nome.toLowerCase().includes(busca)
+            );
+            renderizarListaEstados(filtrados);
+            document.getElementById('listaEstadosMenu').classList.remove('hidden');
+        }
+
+        function selecionarEstado(uf) {
+            document.getElementById('filtroEstado').value = uf;
+            document.getElementById('listaEstadosMenu').classList.add('hidden');
+        }
+
+        document.addEventListener('click', (e) => {
+            const wrapper = document.getElementById('wrapperEstado');
+            if (wrapper && !wrapper.contains(e.target)) {
+                const menu = document.getElementById('listaEstadosMenu');
+                if (menu) menu.classList.add('hidden');
+            }
+        });
+
+        async function carregarCategorias() {
+            try {
+                const res = await fetch(`${API}/categorias`);
+                const cats = await res.json();
+                const selectFiltro = document.getElementById('filtroCategoria');
+                const selectSug = document.getElementById('sugCategoria');
+                cats.forEach(c => {
+                    selectFiltro.innerHTML += `<option value="${c.nome}">${c.nome}</option>`;
+                    selectSug.innerHTML += `<option value="${c.nome}">${c.nome}</option>`;
+                });
+            } catch(e) {
+                console.error("Erro ao carregar categorias", e);
+            }
+        }
+
+        // Busca Ativos limitada a 12 na home
+        async function buscarRoles(filtros = {}) {
+            const grid = document.getElementById('gridAtivos');
+            grid.innerHTML = '<div class="col-span-full text-center py-10 text-slate-400 text-sm font-medium">Buscando programação disponível...</div>';
+
+            const params = new URLSearchParams();
+            if (filtros.estado) params.append("estado", filtros.estado);
+            if (filtros.cidade) params.append("cidade", filtros.cidade);
+            if (filtros.categoria) params.append("categoria", filtros.categoria);
+
+            try {
+                const res = await fetch(`${API}/roles/explorar?${params.toString()}`);
+                const roles = await res.json();
+
+                if (roles.length === 0) {
+                    grid.innerHTML = '<div class="col-span-full neo-box p-10 text-center text-slate-500 font-semibold text-sm">Nenhum evento futuro encontrado com os filtros selecionados.</div>';
+                    document.getElementById('boxVerMaisAtivos').classList.add('hidden');
+                    return;
+                }
+
+                // Guarda todos no cache para abrir instantaneamente no modal
+                roles.forEach(r => eventosCache[r.id] = r);
+
+                // Limita a exibição inicial em 12
+                const limitados = roles.slice(0, 12);
+
+                grid.innerHTML = limitados.map(r => `
+                    <div onclick="abrirDetalhesEvento(${r.id})" class="neo-box overflow-hidden flex flex-col justify-between group cursor-pointer transition hover:-translate-y-1">
+                        <div class="relative h-48 w-full overflow-hidden">
+                            <img src="${r.image || 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800'}" class="w-full h-full object-cover transition duration-300 group-hover:scale-105">
+                            <span class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md">${r.category}</span>
+                            <span class="absolute bottom-3 right-3 bg-white/90 backdrop-blur-md text-slate-900 text-xs font-black px-2.5 py-1 rounded-md shadow-sm">${r.price}</span>
+                        </div>
+                        <div class="p-5 flex-1 flex flex-col justify-between space-y-3">
+                            <div>
+                                <h4 class="text-base font-bold text-slate-900 group-hover:text-[#DB5227] transition line-clamp-1">${r.title}</h4>
+                                <p class="text-xs text-slate-500 font-medium mt-1">📍 ${r.venue} • ${r.cidade}/${r.estado}</p>
+                                ${r.data_evento ? `<p class="text-[11px] font-bold text-slate-700 mt-1">🗓️ ${formatarData(r.data_evento)}</p>` : ''}
+                                <p class="text-xs text-slate-600 line-clamp-2 mt-2">${r.descricao || 'Toque para ver a programação completa.'}</p>
+                            </div>
+                            <div class="pt-3 border-t border-slate-200/60 flex items-center justify-between text-xs font-semibold text-slate-500">
+                                <span>${r.likes || 0} curtidas</span>
+                                <span class="text-[#DB5227] font-bold flex items-center gap-1">Ver Detalhes →</span>
+                            </div>
+                        </div>
+                    </div>`).join('');
+
+                // Gerencia o botão "Ver todos"
+                const boxVerMais = document.getElementById('boxVerMaisAtivos');
+                if (roles.length > 12) {
+                    boxVerMais.classList.remove('hidden');
+                    document.getElementById('labelTotalAtivos').innerText = `Ver todos os ${roles.length} eventos no catálogo`;
+                    document.getElementById('subtituloDestaque').innerText = `Mostrando os 12 principais de ${roles.length} eventos disponíveis`;
+                } else {
+                    boxVerMais.classList.add('hidden');
+                    document.getElementById('subtituloDestaque').innerText = `Exibindo ${roles.length} eventos confirmados`;
+                }
+
+            } catch(e) {
+                grid.innerHTML = '<div class="col-span-full text-center py-10 text-rose-500 text-sm font-medium">Erro de conexão ao carregar eventos.</div>';
+            }
+        }
+
+        // Busca Passados limitada a 4 na home
+        async function buscarRolesPassados() {
+            const grid = document.getElementById('gridPassados');
+            try {
+                const res = await fetch(`${API}/roles/passados`);
+                const roles = await res.json();
+
+                if (roles.length === 0) {
+                    grid.innerHTML = '<div class="col-span-full text-slate-400 text-xs font-medium">Nenhum evento registrado no arquivo histórico.</div>';
+                    document.getElementById('boxVerMaisPassados').classList.add('hidden');
+                    return;
+                }
+
+                roles.forEach(r => eventosCache[r.id] = r);
+                const limitados = roles.slice(0, 4);
+
+                grid.innerHTML = limitados.map(r => `
+                    <div onclick="abrirDetalhesEvento(${r.id})" class="bg-white/50 border border-slate-300/50 rounded-2xl overflow-hidden p-3 flex flex-col justify-between cursor-pointer hover:bg-white transition group">
+                        <img src="${r.image || 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800'}" class="w-full h-28 object-cover rounded-xl grayscale group-hover:grayscale-0 transition">
+                        <div class="mt-2.5">
+                            <span class="text-[9px] font-bold text-slate-500 uppercase tracking-wider">${r.category}</span>
+                            <h5 class="text-xs font-bold text-slate-800 line-clamp-1 group-hover:text-[#DB5227] transition">${r.title}</h5>
+                            <p class="text-[10px] text-slate-500 mt-0.5">${r.cidade}/${r.estado} • ${formatarData(r.data_evento)}</p>
+                        </div>
+                    </div>`).join('');
+
+                const boxVerMais = document.getElementById('boxVerMaisPassados');
+                if (roles.length > 4) {
+                    boxVerMais.classList.remove('hidden');
+                    document.getElementById('labelTotalPassados').innerText = `Acessar acervo histórico completo (${roles.length} eventos)`;
+                } else {
+                    boxVerMais.classList.add('hidden');
+                }
+
+            } catch(e) {
+                grid.innerHTML = '';
+            }
+        }
+
+        // Funções do Modal de Detalhes
+        function abrirDetalhesEvento(id) {
+            const ev = eventosCache[id];
+            if (!ev) return;
+            eventoSelecionadoAtual = ev;
+
+            document.getElementById('detImg').src = ev.image || 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800';
+            document.getElementById('detCat').innerText = ev.category || 'Geral';
+            document.getElementById('detTitulo').innerText = ev.title;
+            document.getElementById('detLocal').innerText = `📍 ${ev.venue} • ${ev.cidade}/${ev.estado}`;
+            document.getElementById('detData').innerText = formatarData(ev.data_evento) || 'A confirmar';
+            document.getElementById('detPreco').innerText = ev.price || 'Gratuito';
+            document.getElementById('detLikes').innerText = `${ev.likes || 0} curtidas`;
+            document.getElementById('detDesc').innerText = ev.descricao || 'O produtor deste evento não incluiu descrição detalhada.';
+
+            const btnIngresso = document.getElementById('detLinkIngresso');
+            if (ev.link_ingresso && ev.link_ingresso.startsWith("http")) {
+                btnIngresso.href = ev.link_ingresso;
+                btnIngresso.classList.remove('hidden');
+                btnIngresso.innerText = "Garantir Ingresso / Link Oficial";
+            } else {
+                btnIngresso.href = "#";
+                btnIngresso.innerText = "Entrada / Pagamento no Local";
+                btnIngresso.classList.add('pointer-events-none', 'opacity-70');
+            }
+
+            document.getElementById('modalDetalhes').classList.remove('hidden');
+        }
+
+        function fecharModalDetalhes() {
+            document.getElementById('modalDetalhes').classList.add('hidden');
+            eventoSelecionadoAtual = null;
+        }
+
+        function compartilharEvento() {
+            if (!eventoSelecionadoAtual) return;
+            const texto = encodeURIComponent(`Olha esse rolê que encontrei no Onde Hoje: ${eventoSelecionadoAtual.title} em ${eventoSelecionadoAtual.cidade}/${eventoSelecionadoAtual.estado}!\nData: ${formatarData(eventoSelecionadoAtual.data_evento)}.`);
+            window.open(`https://wa.me/?text=${texto}`, '_blank');
+        }
+
+        function formatarData(dataStr) {
+            if (!dataStr) return '';
+            const partes = dataStr.split('-');
+            if (partes.length === 3) return `${partes[2]}/${partes[1]}/${partes[0]}`;
+            return dataStr;
+        }
+
+        function filtrarRoles(e) {
+            e.preventDefault();
+            const estado = document.getElementById('filtroEstado').value.trim();
+            const cidade = document.getElementById('filtroCidade').value.trim();
+            const categoria = document.getElementById('filtroCategoria').value;
+            buscarRoles({ estado, cidade, categoria });
+        }
+
+        function limparFiltros() {
+            document.getElementById('filtroEstado').value = '';
+            document.getElementById('filtroCidade').value = '';
+            document.getElementById('filtroCategoria').value = '';
+            buscarRoles();
+        }
+
+        function abrirModalSugerir() {
+            document.getElementById('modalSugerir').classList.remove('hidden');
+        }
+
+        function fecharModalSugerir() {
+            document.getElementById('modalSugerir').classList.add('hidden');
+        }
+
+        function alternarModoImagem(tipo) {
+            const inputUrl = document.getElementById('sugImgUrl');
+            const inputFile = document.getElementById('sugImgFile');
+            const msgSemFoto = document.getElementById('msgSemFoto');
+
+            if (tipo === 'url') {
+                inputUrl.classList.remove('hidden');
+                inputFile.classList.add('hidden');
+                msgSemFoto.classList.add('hidden');
+            } else if (tipo === 'arquivo') {
+                inputUrl.classList.add('hidden');
+                inputFile.classList.remove('hidden');
+                msgSemFoto.classList.add('hidden');
+            } else {
+                inputUrl.classList.add('hidden');
+                inputFile.classList.add('hidden');
+                msgSemFoto.classList.remove('hidden');
+            }
+        }
+
+        async function enviarSugestao(e) {
+            e.preventDefault();
+            const tipoImagem = document.querySelector('input[name="tipoImagem"]:checked').value;
+            let imagemFinal = "";
+            const btnSubmit = document.getElementById('btnSubmitSugestao');
+            
+            btnSubmit.innerText = "Enviando...";
+            btnSubmit.disabled = true;
+
+            try {
+                if (tipoImagem === 'url') {
+                    imagemFinal = document.getElementById('sugImgUrl').value.trim();
+                } else if (tipoImagem === 'arquivo') {
+                    const fileInput = document.getElementById('sugImgFile');
+                    if (fileInput.files.length > 0) {
+                        const formData = new FormData();
+                        formData.append("file", fileInput.files[0]);
+                        const resUpload = await fetch(`${API}/upload/`, { method: 'POST', body: formData });
+                        if (resUpload.ok) {
+                            const dataUpload = await resUpload.json();
+                            imagemFinal = dataUpload.url; 
+                        } else {
+                            alert("Falha ao fazer upload da imagem.");
+                            btnSubmit.innerText = "Submeter Proposta";
+                            btnSubmit.disabled = false;
+                            return;
+                        }
+                    }
+                }
+
+                const payload = {
+                    title: document.getElementById('sugTitle').value.trim(),
+                    venue: document.getElementById('sugVenue').value.trim(),
+                    data_evento: document.getElementById('sugData').value,
+                    estado: document.getElementById('sugEstado').value.trim().toUpperCase(),
+                    cidade: document.getElementById('sugCidade').value.trim(),
+                    price: document.getElementById('sugPrice').value.trim(),
+                    category: document.getElementById('sugCategoria').value,
+                    image: imagemFinal,
+                    tipo_imagem: tipoImagem,
+                    descricao: document.getElementById('sugDescricao').value.trim(),
+                    link_ingresso: "",
+                    observacao_interna: document.getElementById('sugObs').value.trim(),
+                    parceiro_id: 0
+                };
+
+                const res = await fetch(`${API}/roles/sugerir`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    alert("Obrigado! Sua indicação foi recebida e está aguardando revisão da equipe de moderação.");
+                    fecharModalSugerir();
+                    e.target.reset();
+                    alternarModoImagem('url');
+                } else {
+                    alert("Houve um problema ao submeter a proposta.");
+                }
+            } catch(err) {
+                alert("Servidor indisponível no momento.");
+            } finally {
+                btnSubmit.innerText = "Submeter Proposta";
+                btnSubmit.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Ambientes virtuais
+venv/
+env/
+.env
+
+# Testes e cobertura
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Banco de dados local (avaliador cria ou inicializa ao rodar)
+*.db
+*.sqlite3
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Uploads (ignora as imagens de teste, mantém a pasta)
+backend/uploads/*
+!backend/uploads/.gitkeep

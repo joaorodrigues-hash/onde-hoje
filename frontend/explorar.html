@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo Completo - Onde Hoje</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230f172a'%3E%3Cpath d='M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z' fill='%23DB5227'/%3E%3C/svg%3E">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-[#e4e8ee] text-slate-800 min-h-screen font-['Inter'] antialiased flex flex-col justify-between">
+
+    <!-- Topbar -->
+    <header class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <a href="index.html" class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-600 hover:text-slate-900 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                    Voltar ao Início
+                </a>
+            </div>
+            
+            <a href="parceiros.html" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition">Área do Produtor</a>
+        </div>
+    </header>
+
+    <!-- Conteúdo do Catálogo -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 w-full flex-1 space-y-8">
+        
+        <!-- Header & Abas Ativos / Histórico -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-300/60 pb-6">
+            <div>
+                <span class="text-xs font-bold uppercase tracking-widest text-[#DB5227]">Acervo Oficial</span>
+                <h2 id="tituloCatalogo" class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Catálogo de Eventos</h2>
+                <p id="subtituloCatalogo" class="text-xs sm:text-sm text-slate-500">Navegue por todos os rolês cadastrados na plataforma</p>
+            </div>
+
+            <!-- Abas -->
+            <div class="flex bg-slate-200/60 p-1.5 rounded-xl self-start md:self-auto">
+                <button onclick="alternarTipoCatalogo('ativos')" id="btnAbaAtivos" class="px-5 py-2 text-xs font-bold uppercase tracking-wider rounded-lg bg-white text-slate-900 shadow-sm transition">
+                    Próximos Eventos
+                </button>
+                <button onclick="alternarTipoCatalogo('passados')" id="btnAbaPassados" class="px-5 py-2 text-xs font-bold uppercase tracking-wider rounded-lg text-slate-500 hover:text-slate-900 transition">
+                    Arquivo Histórico
+                </button>
+            </div>
+        </div>
+
+        <!-- Barra de Busca Rápida -->
+        <div class="neo-box p-4 flex flex-col sm:flex-row gap-3">
+            <input type="text" id="campoBuscaTexto" oninput="aplicarFiltroLocal()" placeholder="Filtrar por nome, espaço ou cidade..." class="neo-input text-sm flex-1">
+            <select id="campoFiltroCategoria" onchange="aplicarFiltroLocal()" class="neo-input text-sm font-medium sm:w-56">
+                <option value="">Todas as Categorias</option>
+            </select>
+        </div>
+
+        <!-- Grade de Todos os Eventos -->
+        <div id="gridCatalogo" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-200 bg-white/50 py-6 px-6 text-center text-xs text-slate-500 font-medium">
+        <p>© 2026 Onde Hoje - Exibição completa de acervo.</p>
+    </footer>
+
+    <!-- Modal: Detalhes do Evento -->
+    <div id="modalDetalhes" class="fixed inset-0 modal-overlay z-50 hidden flex justify-center items-end sm:items-center p-0 sm:p-4">
+        <div class="bg-[#e4e8ee] w-full max-w-2xl rounded-t-3xl sm:rounded-3xl max-h-[92vh] overflow-hidden flex flex-col relative shadow-2xl">
+            <button onclick="fecharModalDetalhes()" class="absolute top-4 right-4 z-20 bg-slate-900/60 hover:bg-slate-900 text-white p-2 rounded-full backdrop-blur-md transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+
+            <div class="relative h-60 sm:h-72 w-full bg-slate-900 shrink-0">
+                <img id="detImg" src="" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/30 to-transparent"></div>
+                <div class="absolute bottom-4 left-5 right-5 text-white">
+                    <span id="detCat" class="bg-[#DB5227] text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md inline-block mb-2"></span>
+                    <h2 id="detTitulo" class="text-xl sm:text-2xl font-black leading-tight"></h2>
+                    <p id="detLocal" class="text-xs sm:text-sm text-slate-200 mt-1 font-medium"></p>
+                </div>
+            </div>
+
+            <div class="p-6 overflow-y-auto space-y-6 flex-1">
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    <div class="bg-white/60 border border-slate-200/80 p-3 rounded-xl text-center">
+                        <span class="text-[10px] font-bold uppercase text-slate-400 block">Data do Evento</span>
+                        <span id="detData" class="text-xs sm:text-sm font-bold text-slate-800"></span>
+                    </div>
+                    <div class="bg-white/60 border border-slate-200/80 p-3 rounded-xl text-center">
+                        <span class="text-[10px] font-bold uppercase text-slate-400 block">Entrada</span>
+                        <span id="detPreco" class="text-xs sm:text-sm font-bold text-[#DB5227]"></span>
+                    </div>
+                    <div class="col-span-2 sm:col-span-1 bg-white/60 border border-slate-200/80 p-3 rounded-xl text-center">
+                        <span class="text-[10px] font-bold uppercase text-slate-400 block">Engajamento</span>
+                        <span id="detLikes" class="text-xs sm:text-sm font-bold text-slate-800"></span>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-700">Descrição</h4>
+                    <p id="detDesc" class="text-xs sm:text-sm text-slate-600 leading-relaxed whitespace-pre-line"></p>
+                </div>
+
+                <div class="pt-2 flex flex-col sm:flex-row gap-3">
+                    <a id="detLinkIngresso" href="#" target="_blank" class="flex-1 py-3.5 bg-[#DB5227] hover:bg-[#c2441e] text-white text-center rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-sm">
+                        Garantir Presença
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API = "http://127.0.0.1:8000";
+        let tipoAtual = "ativos";
+        let listaTotalEventos = [];
+
+        window.onload = () => {
+            const params = new URLSearchParams(window.location.search);
+            const tipoParam = params.get('tipo');
+            if (tipoParam === 'passados') tipoAtual = 'passados';
+
+            carregarCategorias();
+            atualizarAbasVisuais();
+            carregarCatalogo();
+        };
+
+        function alternarTipoCatalogo(tipo) {
+            tipoAtual = tipo;
+            atualizarAbasVisuais();
+            carregarCatalogo();
+        }
+
+        function atualizarAbasVisuais() {
+            const btnAtivos = document.getElementById('btnAbaAtivos');
+            const btnPassados = document.getElementById('btnAbaPassados');
+            const tit = document.getElementById('tituloCatalogo');
+            const sub = document.getElementById('subtituloCatalogo');
+
+            if (tipoAtual === 'ativos') {
+                btnAtivos.className = "px-5 py-2 text-xs font-bold uppercase tracking-wider rounded-lg bg-white text-slate-900 shadow-sm transition";
+                btnPassados.className = "px-5 py-2 text-xs font-bold uppercase tracking-wider rounded-lg text-slate-500 hover:text-slate-900 transition";
+                tit.innerText = "Programação Futura";
+                sub.innerText = "Todos os rolês ativos confirmados para os próximos dias";
+            } else {
+                btnPassados.className = "px-5 py-2 text-xs font-bold uppercase tracking-wider rounded-lg bg-white text-slate-900 shadow-sm transition";
+                btnAtivos.className = "px-5 py-2 text-xs font-bold uppercase tracking-wider rounded-lg text-slate-500 hover:text-slate-900 transition";
+                tit.innerText = "Arquivo Histórico";
+                sub.innerText = "Edições memoráveis que já foram realizadas na plataforma";
+            }
+        }
+
+        async function carregarCategorias() {
+            try {
+                const res = await fetch(`${API}/categorias`);
+                const cats = await res.json();
+                const sel = document.getElementById('campoFiltroCategoria');
+                cats.forEach(c => sel.innerHTML += `<option value="${c.nome}">${c.nome}</option>`);
+            } catch(e) {}
+        }
+
+        async function carregarCatalogo() {
+            const grid = document.getElementById('gridCatalogo');
+            grid.innerHTML = '<div class="col-span-full text-center py-12 text-slate-400 text-sm font-medium">Carregando acervo completo...</div>';
+
+            const rota = tipoAtual === 'ativos' ? '/roles/explorar' : '/roles/passados';
+
+            try {
+                const res = await fetch(`${API}${rota}`);
+                listaTotalEventos = await res.json();
+                aplicarFiltroLocal();
+            } catch(e) {
+                grid.innerHTML = '<div class="col-span-full text-center py-12 text-rose-500 text-sm font-medium">Erro ao carregar acervo.</div>';
+            }
+        }
+
+        function aplicarFiltroLocal() {
+            const grid = document.getElementById('gridCatalogo');
+            const busca = document.getElementById('campoBuscaTexto').value.trim().toLowerCase();
+            const cat = document.getElementById('campoFiltroCategoria').value;
+
+            const filtrados = listaTotalEventos.filter(ev => {
+                const matchTexto = ev.title.toLowerCase().includes(busca) || 
+                                   ev.venue.toLowerCase().includes(busca) || 
+                                   ev.cidade.toLowerCase().includes(busca);
+                const matchCat = cat === "" || ev.category === cat;
+                return matchTexto && matchCat;
+            });
+
+            if (filtrados.length === 0) {
+                grid.innerHTML = '<div class="col-span-full neo-box p-12 text-center text-slate-500 font-semibold text-sm">Nenhum evento corresponde aos termos filtrados.</div>';
+                return;
+            }
+
+            grid.innerHTML = filtrados.map(r => `
+                <div onclick="abrirDetalhesEvento(${r.id})" class="neo-box overflow-hidden flex flex-col justify-between group cursor-pointer transition hover:-translate-y-1">
+                    <div class="relative h-48 w-full overflow-hidden">
+                        <img src="${r.image || 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800'}" class="w-full h-full object-cover transition duration-300 group-hover:scale-105 ${tipoAtual === 'passados' ? 'grayscale group-hover:grayscale-0' : ''}">
+                        <span class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md">${r.category}</span>
+                        <span class="absolute bottom-3 right-3 bg-white/90 backdrop-blur-md text-slate-900 text-xs font-black px-2.5 py-1 rounded-md shadow-sm">${r.price}</span>
+                    </div>
+                    <div class="p-5 flex-1 flex flex-col justify-between space-y-3">
+                        <div>
+                            <h4 class="text-base font-bold text-slate-900 group-hover:text-[#DB5227] transition line-clamp-1">${r.title}</h4>
+                            <p class="text-xs text-slate-500 font-medium mt-1">📍 ${r.venue} • ${r.cidade}/${r.estado}</p>
+                            ${r.data_evento ? `<p class="text-[11px] font-bold text-slate-700 mt-1">🗓️ ${formatarData(r.data_evento)}</p>` : ''}
+                        </div>
+                        <div class="pt-3 border-t border-slate-200/60 flex items-center justify-between text-xs font-semibold text-slate-500">
+                            <span>${r.likes || 0} curtidas</span>
+                            <span class="text-[#DB5227] font-bold">Ver Ficha →</span>
+                        </div>
+                    </div>
+                </div>`).join('');
+        }
+
+        function abrirDetalhesEvento(id) {
+            const ev = listaTotalEventos.find(x => x.id === id);
+            if (!ev) return;
+
+            document.getElementById('detImg').src = ev.image || 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800';
+            document.getElementById('detCat').innerText = ev.category || 'Geral';
+            document.getElementById('detTitulo').innerText = ev.title;
+            document.getElementById('detLocal').innerText = `📍 ${ev.venue} • ${ev.cidade}/${ev.estado}`;
+            document.getElementById('detData').innerText = formatarData(ev.data_evento) || 'A confirmar';
+            document.getElementById('detPreco').innerText = ev.price || 'Gratuito';
+            document.getElementById('detLikes').innerText = `${ev.likes || 0} curtidas`;
+            document.getElementById('detDesc').innerText = ev.descricao || 'Sem descrição informada.';
+
+            const btnIngresso = document.getElementById('detLinkIngresso');
+            if (ev.link_ingresso && ev.link_ingresso.startsWith("http")) {
+                btnIngresso.href = ev.link_ingresso;
+                btnIngresso.classList.remove('hidden');
+            } else {
+                btnIngresso.classList.add('hidden');
+            }
+
+            document.getElementById('modalDetalhes').classList.remove('hidden');
+        }
+
+        function fecharModalDetalhes() {
+            document.getElementById('modalDetalhes').classList.add('hidden');
+        }
+
+        function formatarData(dataStr) {
+            if (!dataStr) return '';
+            const partes = dataStr.split('-');
+            if (partes.length === 3) return `${partes[2]}/${partes[1]}/${partes[0]}`;
+            return dataStr;
+        }
+    </script>
+</body>
+</html>

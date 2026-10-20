@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel do Produtor - Onde Hoje</title>
+    <!-- Favicon SVG de Painel de Controle -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230f172a'%3E%3Crect x='3' y='3' width='8' height='8' rx='2' fill='%23DB5227'/%3E%3Crect x='13' y='3' width='8' height='5' rx='2'/%3E%3Crect x='13' y='10' width='8' height='11' rx='2'/%3E%3Crect x='3' y='13' width='8' height='8' rx='2'/%3E%3C/svg%3E">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-[#e4e8ee] text-slate-800 min-h-screen font-['Inter'] antialiased">
+
+    <!-- Header com Navegação -->
+    <header class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-6">
+                <h1 class="text-xl font-black text-slate-900 tracking-tight">Onde<span class="text-[#DB5227]">Hoje</span> <span class="text-xs text-slate-400 ml-2 font-medium border-l border-slate-300 pl-2">Produtor</span></h1>
+                
+                <nav class="hidden md:flex items-center gap-2">
+                    <button onclick="alternarAba('desempenho')" id="tab-desempenho" class="px-3.5 py-1.5 text-xs font-bold uppercase rounded-lg bg-slate-900 text-white transition">Visão Geral</button>
+                    <button onclick="alternarAba('perfil')" id="tab-perfil" class="px-3.5 py-1.5 text-xs font-bold uppercase rounded-lg text-slate-600 hover:text-slate-900 transition">Meu Perfil</button>
+                </nav>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <span id="nomeParceiro" class="text-sm font-bold text-slate-700 hidden md:block"></span>
+                <button onclick="alternarAba('perfil')" class="md:hidden text-xs font-bold uppercase text-slate-700">Perfil</button>
+                <button onclick="sair()" class="text-xs font-bold uppercase tracking-wider text-rose-600 hover:text-rose-800 transition">Sair</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-6 mt-4">
+        
+        <!-- SEÇÃO 1: VISÃO GERAL -->
+        <section id="secao-desempenho" class="space-y-8">
+            <div>
+                <h2 class="text-2xl font-bold tracking-tight text-slate-900">Seu Desempenho</h2>
+                <p class="text-sm text-slate-500">Métricas dos seus eventos na plataforma</p>
+            </div>
+
+            <!-- Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div onclick="abrirModalEventos()" class="neo-box p-6 flex flex-col justify-center cursor-pointer transition hover:opacity-90 relative group">
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Eventos Publicados</p>
+                    <h3 id="cardPublicados" class="text-4xl font-extrabold mt-2 text-[#DB5227]">0</h3>
+                    <span class="text-[10px] text-slate-400 font-medium mt-1">Clique para ver a lista</span>
+                    <div class="absolute right-6 top-6 text-slate-300 group-hover:text-[#DB5227] transition">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    </div>
+                </div>
+                
+                <div class="neo-box p-6 flex flex-col justify-center">
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Em Análise</p>
+                    <h3 id="cardPendentes" class="text-4xl font-extrabold mt-2 text-slate-800">0</h3>
+                    <span class="text-[10px] text-slate-400 font-medium mt-1">Aguardando moderação</span>
+                </div>
+                
+                <div class="neo-box p-6 flex flex-col justify-center">
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Total de Likes</p>
+                    <h3 id="cardLikes" class="text-4xl font-extrabold mt-2 text-slate-800">0</h3>
+                    <span class="text-[10px] text-slate-400 font-medium mt-1">Interação do público</span>
+                </div>
+            </div>
+
+            <!-- Gráfico -->
+            <div class="neo-box p-6 md:p-8">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900">Eventos Cadastrados ao Longo do Tempo</h3>
+                        <p class="text-xs text-slate-500">Acompanhe o volume de rolês inseridos na plataforma</p>
+                    </div>
+                    <div class="flex bg-slate-200/50 p-1 rounded-lg">
+                        <button onclick="atualizarGrafico('semanal')" id="btn-semanal" class="px-3 py-1.5 text-xs font-bold uppercase rounded-md text-slate-500 hover:text-slate-900 transition">Semanal</button>
+                        <button onclick="atualizarGrafico('mensal')" id="btn-mensal" class="px-3 py-1.5 text-xs font-bold uppercase rounded-md bg-white text-slate-900 shadow-sm transition">Mensal</button>
+                        <button onclick="atualizarGrafico('semestral')" id="btn-semestral" class="px-3 py-1.5 text-xs font-bold uppercase rounded-md text-slate-500 hover:text-slate-900 transition">Semestral</button>
+                        <button onclick="atualizarGrafico('anual')" id="btn-anual" class="px-3 py-1.5 text-xs font-bold uppercase rounded-md text-slate-500 hover:text-slate-900 transition">Anual</button>
+                    </div>
+                </div>
+                <div class="h-72 w-full">
+                    <canvas id="graficoCrescimento"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 2: MEU PERFIL -->
+        <section id="secao-perfil" class="hidden space-y-6">
+            <div class="max-w-3xl mx-auto">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold tracking-tight text-slate-900">Dados da Empresa</h2>
+                    <p class="text-sm text-slate-500">Mantenha as informações da sua organização e acesso em dia</p>
+                </div>
+
+                <div class="neo-box p-8">
+                    <form onsubmit="salvarPerfilParceiro(event)" class="space-y-6">
+                        <!-- CNPJ (Não editável) -->
+                        <div>
+                            <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 block mb-1">CNPJ (Identificador único)</label>
+                            <input type="text" id="pCnpj" class="neo-input text-sm bg-slate-100 text-slate-500 cursor-not-allowed" disabled>
+                        </div>
+
+                        <!-- Razão Social e Nome Fantasia -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-[11px] font-bold uppercase tracking-wider text-slate-600 block mb-1">Nome Fantasia (Exibido no site)</label>
+                                <input type="text" id="pNomeFantasia" class="neo-input text-sm" required>
+                            </div>
+                            <div>
+                                <label class="text-[11px] font-bold uppercase tracking-wider text-slate-600 block mb-1">Razão Social</label>
+                                <input type="text" id="pRazaoSocial" class="neo-input text-sm" required>
+                            </div>
+                        </div>
+
+                        <!-- Representante Legal -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-[11px] font-bold uppercase tracking-wider text-slate-600 block mb-1">Nome do Responsável</label>
+                                <input type="text" id="pNome" class="neo-input text-sm" required>
+                            </div>
+                            <div>
+                                <label class="text-[11px] font-bold uppercase tracking-wider text-slate-600 block mb-1">Sobrenome</label>
+                                <input type="text" id="pSobrenome" class="neo-input text-sm" required>
+                            </div>
+                        </div>
+
+                        <!-- E-mail e Localização -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="md:col-span-1">
+                                <label class="text-[11px] font-bold uppercase tracking-wider text-slate-600 block mb-1">E-mail de Contato</label>
+                                <input type="email" id="pEmail" class="neo-input text-sm" required>
+                            </div>
+                            <div>
+                                <label class="text-[11px] font-bold uppercase tracking-wider text-slate-600 block mb-1">Cidade</label>
+                                <input type="text" id="pCidade" class="neo-input text-sm" required>
+                            </div>
+                            <div>
+                                <label class="text-[11px] font-bold uppercase tracking-wider text-slate-600 block mb-1">Estado (UF)</label>
+                                <input type="text" id="pEstado" class="neo-input text-sm uppercase" maxlength="2" required>
+                            </div>
+                        </div>
+
+                        <!-- Alteração de Senha -->
+                        <div class="border-t border-slate-300/60 pt-6 space-y-4">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-800">Segurança & Acesso</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-[11px] font-medium text-slate-600 block mb-1">Senha Atual (apenas se for alterar)</label>
+                                    <input type="password" id="pSenhaAntiga" class="neo-input text-sm" placeholder="Sua senha em vigor">
+                                </div>
+                                <div>
+                                    <label class="text-[11px] font-medium text-slate-600 block mb-1">Nova Senha</label>
+                                    <input type="password" id="pSenhaNova" class="neo-input text-sm" placeholder="Deixe em branco para manter">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end pt-2">
+                            <button type="submit" class="neo-btn neo-btn-accent px-8 py-3 text-xs font-bold uppercase tracking-wider">Salvar Alterações</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal: Meus Eventos -->
+    <div id="modalEventos" class="fixed inset-0 modal-overlay z-50 hidden flex justify-center items-center p-4">
+        <div class="bg-[#e4e8ee] w-full max-w-2xl rounded-3xl p-6 md:p-8 max-h-[85vh] flex flex-col relative" style="box-shadow: 12px 12px 24px #c2c5ca, -12px -12px 24px #ffffff;">
+            <button onclick="fecharModalEventos()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-800 transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+            <h2 class="text-2xl font-bold tracking-tight text-slate-900 mb-1">Meus Rolês</h2>
+            <p class="text-xs text-slate-500 mb-6">Lista completa dos eventos que você enviou.</p>
+            <div class="overflow-y-auto pr-2 space-y-4 flex-1">
+                <div id="listaMeusEventos" class="space-y-4"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API = "http://127.0.0.1:8000";
+        let parceiro = JSON.parse(localStorage.getItem('parceiroLogado'));
+        let chartInstancia = null;
+        let dadosGraficoCompletos = null;
+
+        if (!parceiro) {
+            window.location.href = "login-parceiro.html";
+        } else {
+            document.getElementById('nomeParceiro').innerText = parceiro.nome_fantasia;
+            carregarDados();
+        }
+
+        function sair() {
+            localStorage.removeItem('parceiroLogado');
+            window.location.href = "login-parceiro.html";
+        }
+
+        function alternarAba(aba) {
+            const secaoDesempenho = document.getElementById('secao-desempenho');
+            const secaoPerfil = document.getElementById('secao-perfil');
+            const tabDesempenho = document.getElementById('tab-desempenho');
+            const tabPerfil = document.getElementById('tab-perfil');
+
+            if (aba === 'desempenho') {
+                secaoDesempenho.classList.remove('hidden');
+                secaoPerfil.classList.add('hidden');
+                tabDesempenho.className = "px-3.5 py-1.5 text-xs font-bold uppercase rounded-lg bg-slate-900 text-white transition";
+                tabPerfil.className = "px-3.5 py-1.5 text-xs font-bold uppercase rounded-lg text-slate-600 hover:text-slate-900 transition";
+            } else {
+                secaoDesempenho.classList.add('hidden');
+                secaoPerfil.classList.remove('hidden');
+                tabPerfil.className = "px-3.5 py-1.5 text-xs font-bold uppercase rounded-lg bg-slate-900 text-white transition";
+                tabDesempenho.className = "px-3.5 py-1.5 text-xs font-bold uppercase rounded-lg text-slate-600 hover:text-slate-900 transition";
+                carregarDadosPerfil();
+            }
+        }
+
+        async function carregarDados() {
+            try {
+                const res = await fetch(`${API}/parceiros/stats/${parceiro.id}`);
+                const data = await res.json();
+                
+                document.getElementById('cardPublicados').innerText = data.publicados;
+                document.getElementById('cardPendentes').innerText = data.pendentes;
+                document.getElementById('cardLikes').innerText = data.likes;
+
+                dadosGraficoCompletos = data.graficos;
+                atualizarGrafico('mensal');
+            } catch (err) {
+                console.error("Erro ao carregar dados:", err);
+            }
+        }
+
+        function atualizarGrafico(periodo) {
+            if (!dadosGraficoCompletos) return;
+
+            ['semanal', 'mensal', 'semestral', 'anual'].forEach(p => {
+                const btn = document.getElementById(`btn-${p}`);
+                if(p === periodo) {
+                    btn.classList.add('bg-white', 'text-slate-900', 'shadow-sm');
+                    btn.classList.remove('text-slate-500');
+                } else {
+                    btn.classList.remove('bg-white', 'text-slate-900', 'shadow-sm');
+                    btn.classList.add('text-slate-500');
+                }
+            });
+
+            const dados = dadosGraficoCompletos[periodo];
+            renderizarChart(dados.labels, dados.dados);
+        }
+
+        function renderizarChart(labels, dados) {
+            const ctx = document.getElementById('graficoCrescimento').getContext('2d');
+            if (chartInstancia) chartInstancia.destroy();
+
+            chartInstancia = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Eventos Cadastrados',
+                        data: dados,
+                        backgroundColor: '#DB5227',
+                        borderRadius: 6,
+                        barThickness: 32
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            grid: { color: 'rgba(0,0,0,0.04)' },
+                            ticks: { stepSize: 1, font: { family: 'Inter', size: 11 } }
+                        },
+                        x: { 
+                            grid: { display: false },
+                            ticks: { font: { family: 'Inter', size: 11 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        async function abrirModalEventos() {
+            document.getElementById('modalEventos').classList.remove('hidden');
+            const listaBox = document.getElementById('listaMeusEventos');
+            listaBox.innerHTML = '<div class="text-center p-4 text-slate-500 text-sm">Carregando eventos...</div>';
+            
+            try {
+                const res = await fetch(`${API}/parceiros/eventos/${parceiro.id}`);
+                const eventos = await res.json();
+                
+                if (eventos.length === 0) {
+                    listaBox.innerHTML = '<div class="text-center p-6 text-slate-500 font-medium text-sm">Nenhum evento registrado ainda.</div>';
+                    return;
+                }
+
+                listaBox.innerHTML = eventos.map(ev => {
+                    let corStatus = ev.status === 'aprovado' ? 'bg-emerald-100 text-emerald-700' : 
+                                    ev.status === 'pendente' ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700';
+                    let labelStatus = ev.status === 'aprovado' ? 'No Ar' : ev.status;
+
+                    return `
+                    <div class="bg-white/50 border border-slate-200/60 p-4 rounded-2xl flex items-center gap-4">
+                        <img src="${ev.image || 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800'}" class="w-16 h-16 object-cover rounded-xl shadow-sm">
+                        <div class="flex-1">
+                            <h4 class="font-bold text-slate-900 text-sm md:text-base">${ev.title}</h4>
+                            <p class="text-xs text-slate-500 font-medium">${ev.category || 'Geral'} • Data: ${ev.data_evento || 'Não informada'}</p>
+                        </div>
+                        <div>
+                            <span class="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-md ${corStatus}">${labelStatus}</span>
+                        </div>
+                    </div>`;
+                }).join('');
+
+            } catch (err) {
+                listaBox.innerHTML = '<div class="text-center p-4 text-rose-500 text-sm">Erro ao buscar eventos.</div>';
+            }
+        }
+
+        function fecharModalEventos() {
+            document.getElementById('modalEventos').classList.add('hidden');
+        }
+
+        // Função anti-cache para garantir dados novos
+        async function carregarDadosPerfil() {
+            try {
+                const url = `${API}/parceiros/perfil/${parceiro.id}?t=${new Date().getTime()}`;
+                const res = await fetch(url);
+                const dados = await res.json();
+                
+                document.getElementById('pCnpj').value = dados.cnpj || '';
+                document.getElementById('pRazaoSocial').value = dados.razao_social || '';
+                document.getElementById('pNomeFantasia').value = dados.nome_fantasia || '';
+                document.getElementById('pNome').value = dados.nome || '';
+                document.getElementById('pSobrenome').value = dados.sobrenome || '';
+                document.getElementById('pEmail').value = dados.email || '';
+                document.getElementById('pCidade').value = dados.cidade || '';
+                document.getElementById('pEstado').value = dados.estado || '';
+            } catch (err) {
+                console.error("Erro no perfil:", err);
+            }
+        }
+
+        async function salvarPerfilParceiro(e) {
+            e.preventDefault();
+            const payload = {
+                razao_social: document.getElementById('pRazaoSocial').value,
+                nome_fantasia: document.getElementById('pNomeFantasia').value,
+                nome: document.getElementById('pNome').value,
+                sobrenome: document.getElementById('pSobrenome').value,
+                email: document.getElementById('pEmail').value,
+                cidade: document.getElementById('pCidade').value,
+                estado: document.getElementById('pEstado').value,
+                senha_antiga: document.getElementById('pSenhaAntiga').value,
+                senha_nova: document.getElementById('pSenhaNova').value
+            };
+
+            try {
+                const res = await fetch(`${API}/parceiros/perfil/${parceiro.id}`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    alert("Dados do perfil atualizados com sucesso!");
+                    parceiro.nome_fantasia = payload.nome_fantasia;
+                    localStorage.setItem('parceiroLogado', JSON.stringify(parceiro));
+                    document.getElementById('nomeParceiro').innerText = payload.nome_fantasia;
+                    document.getElementById('pSenhaAntiga').value = "";
+                    document.getElementById('pSenhaNova').value = "";
+                } else {
+                    const err = await res.json();
+                    alert("Aviso: " + (err.detail || "Erro ao salvar perfil."));
+                }
+            } catch (err) {
+                alert("Erro de comunicação com o servidor.");
+            }
+        }
+    </script>
+</body>
+</html>
