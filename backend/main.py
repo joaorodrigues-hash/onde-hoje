@@ -7,7 +7,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 import uvicorn
 
 from routers import categorias, roles, parceiros, admin, upload
@@ -89,8 +89,16 @@ app.include_router(parceiros.router)
 app.include_router(admin.router)
 app.include_router(upload.router)
 
-# 4. ENTREGA DO FRONTEND (Serve index.html, admin.html, explorar.html, etc. no mesmo domínio)
+# 4. ROTA PRINCIPAL E FRONTEND ESTÁTICO
 pasta_frontend = os.path.join(os.path.dirname(base_dir), "frontend")
+
+@app.get("/", include_in_schema=False)
+async def home():
+    caminho_index = os.path.join(pasta_frontend, "index.html")
+    if os.path.exists(caminho_index):
+        return FileResponse(caminho_index)
+    return {"status": "ok", "message": "Onde Hoje API rodando com sucesso!"}
+
 if os.path.exists(pasta_frontend):
     app.mount("/", StaticFiles(directory=pasta_frontend, html=True), name="frontend")
 
