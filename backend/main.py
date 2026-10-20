@@ -20,7 +20,6 @@ async def lifespan(app: FastAPI):
     iniciar_banco()
     yield
 
-# Desativa docs abertos para criarmos nossa rota protegida
 app = FastAPI(title="Onde Hoje API", lifespan=lifespan, docs_url=None, redoc_url=None, openapi_url=None)
 
 app.add_middleware(
@@ -31,11 +30,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 1. MIDDLEWARE: Proteção Automática (JWT) nas rotas de Moderação
+# 1. MIDDLEWARE: Proteção JWT nas rotas administrativas
 @app.middleware("http")
 async def verificar_token_admin(request: Request, call_next):
     path = request.url.path
-    # Rotas que não podem ser acessadas por fora
     rotas_protegidas = [
         "/admin/stats", "/admin/moderadores", "/admin/perfil",
         "/roles/aprovar", "/roles/rejeitar", "/roles/status", "/roles/pendentes"
@@ -54,7 +52,7 @@ async def verificar_token_admin(request: Request, call_next):
             
     return await call_next(request)
 
-# 2. SWAGGER: Proteção com Senha para os Avaliadores
+# 2. SWAGGER: Proteção HTTP Basic para os Avaliadores Mercos
 security = HTTPBasic()
 
 def verificar_acesso_docs(credentials: HTTPBasicCredentials = Depends(security)):
@@ -67,7 +65,7 @@ def verificar_acesso_docs(credentials: HTTPBasicCredentials = Depends(security))
         return credentials.username
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Credenciais inválidas. O Swagger é restrito.",
+        detail="Credenciais inválidas. O Swagger é restrito à equipe técnica.",
         headers={"WWW-Authenticate": "Basic"},
     )
 
@@ -79,7 +77,7 @@ async def get_swagger_documentation(username: str = Depends(verificar_acesso_doc
 async def openapi(username: str = Depends(verificar_acesso_docs)):
     return get_openapi(title="Onde Hoje API", version="1.0.0", routes=app.routes)
 
-# 3. PASTAS E ROTAS
+# 3. PASTAS ESTÁTICAS E ROTAS DA API
 base_dir = os.path.dirname(os.path.abspath(__file__))
 pasta_uploads = os.path.join(base_dir, "uploads")
 os.makedirs(pasta_uploads, exist_ok=True)
@@ -91,5 +89,11 @@ app.include_router(parceiros.router)
 app.include_router(admin.router)
 app.include_router(upload.router)
 
+# 4. ENTREGA DO FRONTEND (Serve index.html, admin.html, explorar.html, etc. no mesmo domínio)
+pasta_frontend = os.path.join(os.path.dirname(base_dir), "frontend")
+if os.path.exists(pasta_frontend):
+    app.mount("/", StaticFiles(directory=pasta_frontend, html=True), name="frontend")
+
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+    porta = int(os.environ.get("PORT", 8000))
+    uvicorn.run("main:app", host="0.0.0.0", port=porta, reload=False)
